@@ -1,0 +1,132 @@
+
+
+
+Net::IPAddr::FinUds(e3r)Contributed Perl DocumentaNteito:n:IPAddr::Find(3)
+
+
+NNNNAAAAMMMMEEEE
+       Net::IPAddr::Find - Find IP addresses in plain text
+
+SSSSYYYYNNNNOOOOPPPPSSSSIIIISSSS
+         use Net::IPAddr::Find;
+         $num_found = find_ipaddrs($text, \&callback);
+
+
+DDDDEEEESSSSCCCCRRRRIIIIPPPPTTTTIIIIOOOONNNN
+       This is a module for finding IP addresses in plain text.
+
+       FFFFuuuunnnnccccttttiiiioooonnnnssss
+
+       Net::IPAddr::Find exports one function, _f_i_n_d___i_p_a_d_d_r_s_(_). It
+       works very similar to URI::Find's _f_i_n_d___u_r_i_s_(_) or
+       Email::Find's _f_i_n_d___e_m_a_i_l_s_(_).
+
+         $num_ipaddrs_found = find_ipaddrs($text, \&callback);
+
+       The first argument is a text to search through and manipu-
+       late. Second is a callback routine which defines what to
+       do with each IP address as they're found. It returns the
+       total number of IP addresses found.
+
+       The callback is given two arguments. The first is a
+       NetAddr::IP instance representing the IP address found.
+       The second is the actual IP address as found in the text.
+       Whatever the callback returns will replace the original
+       text.
+
+EEEEXXXXAAAAMMMMPPPPLLLLEEEESSSS
+         # For each IP address found, ping its host to see if its alive.
+         use Net::Ping;
+         my $pinger = Net::Ping->new;
+         my %pinged;
+         find_ipaddrs($text, sub {
+                          my($ipaddr, $orig) = @_;
+                          my $host = $ipaddr->to_string;
+                          next if exists $pinged{$host};
+                          $pinged{$host} = $pinger->ping($host);
+                      });
+
+         while (my($host, $up) == each %pinged) {
+             print "$host is " . $up ? 'up' : 'down' . "\n";
+         }
+
+         # Resolve IP address to FQDN
+         find_ipaddrs($text, sub {
+                          my($ipaddr, $orig) = @_;
+                          resolve_ip($ipaddr->to_string);
+                      });
+
+
+
+
+
+
+2001-07-09                 perl v5.5.30                         1
+
+
+
+
+
+Net::IPAddr::FinUds(e3r)Contributed Perl DocumentaNteito:n:IPAddr::Find(3)
+
+
+         sub resolve_ip {
+             use Net::DNS;
+             # see perldoc Net::DNS for details
+         }
+
+
+TTTTOOOODDDDOOOO
+       +o   Subnet support.
+
+       +o   IPv6 support.
+
+AAAAUUUUTTTTHHHHOOOORRRR
+       Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+
+       This library is free software; you can redistribute it
+       and/or modify it under the same terms as Perl itself.
+
+SSSSEEEEEEEE AAAALLLLSSSSOOOO
+       the NetAddr::IP manpage, the URI::Find manpage, the
+       Email::Find manpage, jdresove
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+2001-07-09                 perl v5.5.30                         2
+
+
